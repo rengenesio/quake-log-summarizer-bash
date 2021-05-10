@@ -6,6 +6,7 @@ This script is intended to show how bash scripts and regular expressions may be 
 I don't encourage users to use this as a parser for production environments due to several technical debits:
 - Maintenance to add features or fix bugs may be painful. 
 - This script does a lot of I/O reading the log file more than once to get a match statistics.
+- There are no unit tests.
 
 Even so this script may be an useful tool to quickly parse small log files or to help implementing another parser.
 
