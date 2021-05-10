@@ -35,20 +35,17 @@ for matchLog in $tempDir; do
 
     leftJoin=`join -t';' <(echo "$playerKilled") <(echo "$worldKilled") -a1`
     rightJoin=`join -t';' <(echo "$playerKilled") <(echo "$worldKilled") -a2`
-    fullOuterJoin=`echo "$leftJoin"$'\n'"$rightJoin" \
-        | sort \
+    fullOuterJoin=`sort <<< "$leftJoin"$'\n'"$rightJoin" \
         | uniq`
 
     final=`join -t';' <(echo "$players") <(echo "$fullOuterJoin") -a1`
 
     score=`awk -F ';' '{ score=0; score+=$3; score-=$4; print $2";"score }' <<< "$final"`
 
-    json=`jq -n --arg index $index --arg kills "$kills" --arg players "$players" --arg score "$score" '
+    jq -n --arg index $index --arg totalKills "$kills" --arg players "$players" --arg score "$score" '
         ([$players | split("\n") | .[] | split(";") | .[1]]) as $playersJson
         | (([$score | split("\n") | .[] | split(";") | .[0]]) as $keys | ([$score | split("\n") | .[] | split(";") | .[1]]) as $values | [[$keys, $values] | transpose[] | {key:.[0],value:.[1]}] | from_entries) as $score
-        | { "game_\($index)": { players: $playersJson, total_kills: $kills, kills: $score } }'`
-
-    echo "$json"
+        | { "game_\($index)": { players: $playersJson, total_kills: $totalKills, kills: $score } }'
 
     ((index++))
 done
